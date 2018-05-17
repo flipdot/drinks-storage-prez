@@ -4,13 +4,40 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>drinks-storage-prez</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/white.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<style>
+		/* Image without borders and shadow */
+		.reveal section img {
+			margin: 30px;
+			background: transparent;
+			border: 0;
+
+			-webkit-box-shadow: none;
+			   -moz-box-shadow: none;
+					box-shadow: none;
+		}
+
+		/* Hide arrows and progress bar */
+		/*
+		.reveal .controls {
+			display: none !important;
+		}
+		*/
+		.reveal .progress {
+			height: 10px;
+		}
+		.reveal .progress span {
+			background-color: #f5c600;
+		}
+
+		</style>
 
 		<!-- Printing and PDF exports -->
 		<script>
@@ -24,8 +51,302 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section data-markdown>
+					<script type="text/template">
+						![Bild](img/flipdot-logo-notext.svg)
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Drinks storage
+						Automatisierung der Getränkeversorgung
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Repositories
+						1. `drinks-storage-state`     <!-- .element: class="fragment" data-fragment-index="1" -->
+						1. `drinks-storage-breakout`  <!-- .element: class="fragment" data-fragment-index="2" -->
+						1. `drinks-storage-mqtt`      <!-- .element: class="fragment" data-fragment-index="3" -->
+						1. `drinks-storage-order`     <!-- .element: class="fragment" data-fragment-index="4" -->
+					</script>
+				</section>
+
+				<section />
+					<h3>Schema</h3>
+					<img src="img/diagramm.png" style="max-width:calc(90vh)">
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						| Preis | Stk | Material |
+						|-:|-:|-|
+						| 4 € | 1 | MDF-Platte (40 x 30 cm) |
+						| 2.5 € | 4 | Wägezellen (bis je 50kg) |
+						| 2.5 € | 1 | ESP (WeMos D1) |
+						| 0.5 € | 1 | ADC (HX711) |
+						| 0.5 € | n | Draht |
+						| **10 €** | | **Insgesamt** |
+					</script>
+				</section>
+
+				<!--
+					Get video with the following command:
+					$ youtube-dl -f bestvideo+bestaudio "https://vimeo.com/234878854" -o video/drinks-storage.mp4
+				-->
+				<section data-background-video="video/drinks-storage.mp4" />
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### MQTT lesen
+						```bash
+						mosquitto_sub -h mqtt.fd -v -t 'sensors/cellar/#'
+						```
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### MQTT-Nachrichten
+						`drinks-storage-mqtt`
+						```json
+						sensors/cellar/drinks_scale_measurements_raw:
+						{
+						  "esp_id": 15860432,
+						  "scale_value": 9008694
+						}
+
+						sensors/cellar/drinks_crate_counts:
+						{
+						  "esp_id": 15860432,
+						  "crates": 0
+						}
+						```
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Space API
+						https://api.flipdot.org/
+					</script>
+				</section>
+
+				<!-- TODO Schema-Ausschnitt -->
+
+				<section data-markdown>
+					<script type="text/template">
+						### Statische Getränkedaten
+						```json
+						"beverage_supply": [
+						{
+							"ext_modified": "2018-05-17T12:37:41.875560423+02:00",
+							"location": "cellar",
+							"name": "mio_mate",
+							"unit": "crt",
+							"value": 6
+						},
+						(...)
+						```
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Statistiken
+						https://stats.flipdot.org/
+					</script>
+				</section>
+
+				<section />
+					<img src="img/stats1.png" style="max-width:calc(90vh)">
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Automatische Bestellungen
+						`drinks-storage-order`
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Werte prüfen
+						* Letzte Bestellung > 14d           <!-- .element: class="fragment" data-fragment-index="1" -->
+						* Aktualisierung der API-Daten < 3d <!-- .element: class="fragment" data-fragment-index="2" -->
+						* Kisten-Anzahl > 20                <!-- .element: class="fragment" data-fragment-index="3" -->
+						* Kisten-Anzahl < 40                <!-- .element: class="fragment" data-fragment-index="4" -->
+						  * Iterativ Maximum dekrementieren <!-- .element: class="fragment" data-fragment-index="5" -->
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### PDFs erstellen
+						* Pandoc
+						* Latex Templating
+						* Variablen aus der API
+					</script>
+				</section>
+
+				<section />
+					<img src="img/order.jpg" style="max-height:calc(50vh)">
+				</section>
+
+
+				<section data-markdown>
+					<script type="text/template">
+						### Statistiken
+						* Bestellung markieren
+						* Ankunft markieren
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Cronjob
+						```
+						0 8 * * mon-fri
+						    cd /home/automaton/drinks-storage-order && \
+						    LANG=en_US.UTF-8 ./order.py 2>&1 \
+						    >> /home/automaton/drinks-storage-order/order.log
+						```
+					</script>
+				</section>
+
+				<!-- TODO Create screenshots of incoming order and marked order -->
+
+				<section data-markdown>
+					<script type="text/template">
+						## Hardware
+						* Frästeil
+						* 3D-Druck
+						* Platine
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Fräsen
+						* 3 Fräsgänge
+						  * 3mm/6mm Flat mill (Holz)
+						  * 6mm Passbolzen (thx IKEA)
+					</script>
+				</section>
+
+				<section data-background-image="img/fraesen1.jpg" />
+				</section>
+
+				<section data-background-image="img/fraesen2.jpg" />
+				</section>
+
+				<section data-background-image="img/fraesen3.jpg" />
+				</section>
+
+				<section data-background-image="img/fraesen4.jpg" />
+				</section>
+
+				<section data-background-image="img/fraesen5.jpg" />
+				</section>
+
+				<section data-background-image="img/fraesen6.jpg" />
+				</section>
+
+				<section />
+					<img src="img/fraesen7.jpg" style="max-height:calc(50vh)">
+				</section>
+
+				<section />
+					<img src="img/kaesten-fade.gif" style="max-height:calc(50vh)">
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Lessons learned
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Lektion 1
+						Benutze Kondensatoren!
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						#### Ohne Kondensatoren
+						![Bild](img/stromversorgung1.png)
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						#### Mit Kondensatoren
+						![Bild](img/stromversorgung2.png)
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Lektion 2
+						Taschen Fräsen kostet Zeit!
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						| Name | Zeit |
+						|-|-:|
+						| CAD | 4h-10h ? |
+						| CAM | ~ 40m |
+						| Fräsen | ~ 1h 30m |
+						| ↳ davon Tasche <!-- .element: class="fragment" data-fragment-index="1" --> | ~ 1h <!-- .element: class="fragment" data-fragment-index="1" --> |
+					</script>
+				</section>
+
+
+				<section data-markdown>
+					<script type="text/template">
+						### Lektion 3
+						Miniaturisierung lohnt!
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						* Custom PCB
+						  * Kleiner
+						  * Unter gefräste Platte
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						# Danke
+						für eure Aufmerksamkeit
+
+						und allen die geholfen haben
+					</script>
+				</section>
+				<section data-markdown>
+					<script type="text/template">
+						## Folien
+						![Bild](img/qr-url-slides.png)
+
+						https://github.com/flipdot/drinks-storage-prez
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						# Fragen?
+					</script>
+				</section>
+
 			</div>
 		</div>
 
