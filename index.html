@@ -10,7 +10,10 @@
 		<link rel="stylesheet" href="css/theme/white.css">
 
 		<!-- Theme used for syntax highlighting of code -->
+		<!--
 		<link rel="stylesheet" href="lib/css/zenburn.css">
+		-->
+		<link rel="stylesheet" href="lib/css/github.css">
 
 		<style>
 		/* Image without borders and shadow */
@@ -25,18 +28,26 @@
 		}
 
 		/* Hide arrows and progress bar */
-		/*
 		.reveal .controls {
 			display: none !important;
 		}
-		*/
 		.reveal .progress {
 			height: 10px;
 		}
 		.reveal .progress span {
 			background-color: #f5c600;
 		}
-
+		.reveal mark {
+			color: red;
+			background-color: inherit;
+		}
+		.reveal .slide-number {
+			font-size: 24pt;
+			background: rgba(0, 0, 0, 0.2);
+			bottom: 18px;
+			border-radius: 32px;
+			padding: 6px 12px;
+		}
 		</style>
 
 		<!-- Printing and PDF exports -->
@@ -64,6 +75,11 @@
 					</script>
 				</section>
 
+				<section />
+					<h3>Überblick</h3>
+					<img src="img/drinks-storage-diagramm_1.svg" style="max-width:calc(90vh)">
+				</section>
+
 				<section data-markdown>
 					<script type="text/template">
 						### Repositories
@@ -75,20 +91,13 @@
 				</section>
 
 				<section />
-					<h3>Schema</h3>
-					<img src="img/diagramm.png" style="max-width:calc(90vh)">
+					<h3>Waagen/Kisten → MQTT</h3>
+					<img src="img/drinks-storage-diagramm_2.svg" style="max-width:calc(90vh)">
 				</section>
 
 				<section data-markdown>
 					<script type="text/template">
-						| Preis | Stk | Material |
-						|-:|-:|-|
-						| 4 € | 1 | MDF-Platte (40 x 30 cm) |
-						| 2.5 € | 4 | Wägezellen (bis je 50kg) |
-						| 2.5 € | 1 | ESP (WeMos D1) |
-						| 0.5 € | 1 | ADC (HX711) |
-						| 0.5 € | n | Draht |
-						| **10 €** | | **Insgesamt** |
+						### Demo Video
 					</script>
 				</section>
 
@@ -108,22 +117,38 @@
 					</script>
 				</section>
 
+
+				<!-- TODO Recheck for new msg fmt in space -->
+				<section>
+					<h3>MQTT-Nachrichten</h3>
+					<pre><code data-trim data-noescape class="json">
+<mark style="color: blue">sensors/cellar/drinks_scale_measurements_raw:</mark>
+{
+  "esp_id": 15860432,
+  "scale_value": 9008694
+}
+					</code></pre>
+					<pre class="fragment"><code data-trim data-noescape class="json">
+<mark style="color: blue">sensors/cellar/drinks_crate_counts:</mark>
+{
+  "esp_id": 15860432,
+  "crates": 0
+}
+					</code></pre>
+				</section>
+
 				<section data-markdown>
 					<script type="text/template">
-						### MQTT-Nachrichten
+						### Rohwerte in Kästen
 						`drinks-storage-mqtt`
-						```json
-						sensors/cellar/drinks_scale_measurements_raw:
-						{
-						  "esp_id": 15860432,
-						  "scale_value": 9008694
-						}
-
-						sensors/cellar/drinks_crate_counts:
-						{
-						  "esp_id": 15860432,
-						  "crates": 0
-						}
+						```yaml
+						scales:
+						  0x003ca879: # Decimal: 3975289
+							scale_name: mio_mate
+							tare_raw: 7822700
+							crate_raw: -278657
+							kilogram_raw: -24400
+							tolerance_kg: 0.5
 						```
 					</script>
 				</section>
@@ -135,7 +160,10 @@
 					</script>
 				</section>
 
-				<!-- TODO Schema-Ausschnitt -->
+				<section />
+					<h3>MQTT → API</h3>
+					<img src="img/drinks-storage-diagramm_3.svg" style="max-width:calc(90vh)">
+				</section>
 
 				<section data-markdown>
 					<script type="text/template">
@@ -162,7 +190,25 @@
 				</section>
 
 				<section />
-					<img src="img/stats1.png" style="max-width:calc(90vh)">
+					<h3>API → Stats</h3>
+					<img src="img/drinks-storage-diagramm_4.svg" style="max-width:calc(90vh)">
+				</section>
+
+				<section />
+					<img src="img/stats_gauges.png" style="max-height:calc(50vh)">
+				</section>
+
+				<section />
+					<img src="img/stats_bars.png" style="max-height:calc(50vh)">
+				</section>
+
+				<section />
+					<img src="img/stats_percentages.png" style="max-height:calc(50vh)">
+				</section>
+
+				<section />
+					<h3>Order ← API</h3>
+					<img src="img/drinks-storage-diagramm_5.svg" style="max-width:calc(90vh)">
 				</section>
 
 				<section data-markdown>
@@ -175,10 +221,10 @@
 				<section data-markdown>
 					<script type="text/template">
 						### Werte prüfen
-						* Letzte Bestellung > 14d           <!-- .element: class="fragment" data-fragment-index="1" -->
-						* Aktualisierung der API-Daten < 3d <!-- .element: class="fragment" data-fragment-index="2" -->
-						* Kisten-Anzahl > 20                <!-- .element: class="fragment" data-fragment-index="3" -->
-						* Kisten-Anzahl < 40                <!-- .element: class="fragment" data-fragment-index="4" -->
+						1. Letzte Bestellung > 14d           <!-- .element: class="fragment" data-fragment-index="1" -->
+						1. Aktualisierung der API-Daten < 3d <!-- .element: class="fragment" data-fragment-index="2" -->
+						1. Kisten-Anzahl > 20                <!-- .element: class="fragment" data-fragment-index="3" -->
+						1. Kisten-Anzahl < 40                <!-- .element: class="fragment" data-fragment-index="4" -->
 						  * Iterativ Maximum dekrementieren <!-- .element: class="fragment" data-fragment-index="5" -->
 					</script>
 				</section>
@@ -186,9 +232,9 @@
 				<section data-markdown>
 					<script type="text/template">
 						### PDFs erstellen
-						* Pandoc
-						* Latex Templating
-						* Variablen aus der API
+						* Pandoc                 <!-- .element: class="fragment" data-fragment-index="1" -->
+						* Latex Templating       <!-- .element: class="fragment" data-fragment-index="2" -->
+						* Variablen aus der API  <!-- .element: class="fragment" data-fragment-index="3" -->
 					</script>
 				</section>
 
@@ -196,25 +242,35 @@
 					<img src="img/order.jpg" style="max-height:calc(50vh)">
 				</section>
 
-
-				<section data-markdown>
-					<script type="text/template">
-						### Statistiken
-						* Bestellung markieren
-						* Ankunft markieren
-					</script>
+				<section />
+					<h3>Order → Humans</h3>
+					<img src="img/drinks-storage-diagramm_6.svg" style="max-width:calc(90vh)">
 				</section>
 
-				<section data-markdown>
-					<script type="text/template">
-						### Cronjob
-						```
-						0 8 * * mon-fri
-						    cd /home/automaton/drinks-storage-order && \
-						    LANG=en_US.UTF-8 ./order.py 2>&1 \
-						    >> /home/automaton/drinks-storage-order/order.log
-						```
-					</script>
+				<section>
+					<h3>Cronjob</h3>
+					<pre><code data-trim data-noescape class="nohighlight">
+<mark style="color: magenta">0</mark> <mark style="color: blue">8</mark> <mark style="color: green">*</mark> <mark style="color: magenta">*</mark> <mark style="color: blue">mon-fri</mark>
+    cd /home/automaton/drinks-storage-order && \
+    LANG=en_US.UTF-8 ./order.py 2>&1 \
+    >> /home/automaton/drinks-storage-order/order.log
+					</code></pre>
+				</section>
+
+				<section>
+					<h3>IRC Notifications</h3>
+					<pre class="fragment"><code data-trim data-noescape class="nohighlight">
+<mark style="color: grey">08:00:16</mark> <mark style="color: blue">flipbot</mark>:
+[<mark style="color: green">stats</mark>] Drinks order: The following order has just been sent:
+1 mineralwasser, 3 jacobinus, 3 koestritzer,
+3 grapefruit_sprudel, 3 mio_cola, 3 mio_ginger,
+3 apfelschorle, 2 jever_fun, 4 radler, 1 mio_banane,
+4 eschweger, 4 mio_mate, 4 becks, 2 jever, 40 TOTAL
+					</code></pre>
+					<pre class="fragment"><code data-trim data-noescape class="nohighlight">
+<mark style="color: grey">13:00:08</mark> <mark style="color: blue">flipbot</mark>:
+[<mark style="color: green">stats</mark>] The last order has arrived.
+					</code></pre>
 				</section>
 
 				<!-- TODO Create screenshots of incoming order and marked order -->
@@ -222,18 +278,54 @@
 				<section data-markdown>
 					<script type="text/template">
 						## Hardware
-						* Frästeil
-						* 3D-Druck
-						* Platine
+						* CAD/CAM   <!-- .element: class="fragment" data-fragment-index="1" -->
+						* Frästeil  <!-- .element: class="fragment" data-fragment-index="2" -->
+						* 3D-Druck  <!-- .element: class="fragment" data-fragment-index="3" -->
+						* Platine   <!-- .element: class="fragment" data-fragment-index="4" -->
 					</script>
 				</section>
 
 				<section data-markdown>
 					<script type="text/template">
+						| Preis | Stk | Material |
+						|-:|-:|-|
+						| 4 €  <!-- .element: class="fragment" data-fragment-index="1" -->| 1  <!-- .element: class="fragment" data-fragment-index="1" -->| MDF-Platte (40 x 30 cm)  <!-- .element: class="fragment" data-fragment-index="1" -->|
+						| 2.5 €  <!-- .element: class="fragment" data-fragment-index="2" -->| 4  <!-- .element: class="fragment" data-fragment-index="2" -->| Wägezellen (bis je 50kg)  <!-- .element: class="fragment" data-fragment-index="2" -->|
+						| 2.5 €  <!-- .element: class="fragment" data-fragment-index="3" -->| 1  <!-- .element: class="fragment" data-fragment-index="3" -->| ESP (WeMos D1)  <!-- .element: class="fragment" data-fragment-index="3" -->|
+						| 0.5 €  <!-- .element: class="fragment" data-fragment-index="4" -->| 1  <!-- .element: class="fragment" data-fragment-index="4" -->| ADC (HX711)  <!-- .element: class="fragment" data-fragment-index="4" -->|
+						| 0.5 €  <!-- .element: class="fragment" data-fragment-index="5" -->| n  <!-- .element: class="fragment" data-fragment-index="5" -->| Draht  <!-- .element: class="fragment" data-fragment-index="5" -->|
+						| **10 €**  <!-- .element: class="fragment" data-fragment-index="6" -->| | **Insgesamt**  <!-- .element: class="fragment" data-fragment-index="6" -->|
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### CAD/CAM
+						* Rhinoceros 5                      <!-- .element: class="fragment" data-fragment-index="1" -->
+						  * Erstellung Modell `.3dm`
+						  * Export Stereolithography `.stl`
+						* Estlcam                           <!-- .element: class="fragment" data-fragment-index="2" -->
+						  * Von `.stl` nach `.gcode`
+						* Universal G-Code Sender           <!-- .element: class="fragment" data-fragment-index="3" -->
+						  * Senden des G-Codes an die Fräse
+					</script>
+				</section>
+
+				<section />
+					<img src="img/rhino1.jpg" style="max-height:calc(50vh)">
+				</section>
+
+				<section />
+					<img src="img/rhino2.jpg" style="max-height:calc(50vh)">
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
 						### Fräsen
-						* 3 Fräsgänge
-						  * 3mm/6mm Flat mill (Holz)
-						  * 6mm Passbolzen (thx IKEA)
+						* 3 Fräsgänge <!-- .element: class="fragment" data-fragment -->
+						  * 3mm »Flat mill« (Holz)
+						  * 6mm »Flat mill« (Holz)
+						  * 6mm Passbolzen (IKEA)
 					</script>
 				</section>
 
@@ -265,8 +357,119 @@
 
 				<section data-markdown>
 					<script type="text/template">
+						## 3D-Druck
+						* Zeitaufwändiger als angenommen <!-- .element: class="fragment" data-fragment -->
+						  * ~3h pro Gehäuse
+						  * insgesamt ~20 Exemplare gedruckt
+					</script>
+				</section>
+
+				<section data-background-image="img/3d_druck_1.jpg" />
+				</section>
+
+				<section data-background-image="img/3d_druck_2.jpg" />
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Platine
+
+						`drinks-storage-breakout`
+					</script>
+				</section>
+
+				<section data-background-image="img/platine0.png" />
+				</section>
+
+				<section data-background-image="img/platine1.jpg" />
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Zusammenbau
+					</script>
+				</section>
+
+				<section data-background-image="img/assembly.jpg" />
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Sensoren
+
+						`drinks-storage-state`
+
+						`drinks-storage-mqtt`
+					</script>
+				</section>
+
+				<section />
+					<h3>Drift?</h3>
+					<img src="img/drift.png" style="max-height:calc(50vh)">
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Tarieren
+						1. Waagen leeren <!-- .element: class="fragment" data-fragment-index="1" -->
+						1. Werte aufnehmen <!-- .element: class="fragment" data-fragment-index="2" -->
+						1. Werte mitteln <!-- .element: class="fragment" data-fragment-index="3" -->
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						## Tarieren
+						```bash
+						mosquitto_sub -h mqtt.fd \
+						  -t 'sensors/cellar/drinks_scale_measurements_raw' \
+						  >> drinks-storage-$(date -I).log
+						```
+						```
+						while read -r esp_id; do
+						  esp_int=$(printf "%i" "$esp_id")
+						  grep $esp_int *.log | sed -r \
+							's/.+scale_value":([0-9]+),".+/\1/' > $esp_id.values
+						done <<< $(grep -Eo '0x[0-9a-f]+' \
+						  $DRINKS_STORAGE_MQTT/config.yaml)
+						```
+						```
+						for esp_id in *.values; do
+						  awk "{a+=\$1} END{printf \"${esp_id%%.values} %i\n\", \
+						    a/NR}" $esp_id
+						done
+						```
+					</script>
+				</section>
+
+				<section />
+					<h3>Danke, Eichstein</h3>
+					<img src="img/eichstein.jpg" style="max-height:calc(50vh)">
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
 						## Lessons learned
 					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Lektion 0
+						Filament muss trocken gelagert werden!
+					</script>
+				</section>
+
+				<section data-background-image="img/3d_fail_1.jpg" />
+				</section>
+
+				<section data-background-image="img/3d_fail_2.jpg" />
+				</section>
+
+				<section data-background-image="img/3d_fail_3.jpg" />
+				</section>
+
+				<section data-background-image="img/3d_fail_4.jpg" />
 				</section>
 
 				<section data-markdown>
@@ -308,7 +511,6 @@
 					</script>
 				</section>
 
-
 				<section data-markdown>
 					<script type="text/template">
 						### Lektion 3
@@ -318,9 +520,17 @@
 
 				<section data-markdown>
 					<script type="text/template">
-						* Custom PCB
-						  * Kleiner
-						  * Unter gefräste Platte
+						#### Custom PCB
+						* Kleiner <!-- .element: class="fragment" data-fragment-index="1" -->
+						* Unter gefräste Platte <!-- .element: class="fragment" data-fragment-index="2" -->
+						* Kein 3D-Druck nötig <!-- .element: class="fragment" data-fragment-index="3" -->
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Lektion 4
+						PCBs lässt man fertigen!
 					</script>
 				</section>
 
@@ -365,6 +575,9 @@
 					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
 				]
 			});
+			// Shows the slide number using default formatting
+			Reveal.configure({ slideNumber: true });
+			Reveal.configure({ slideNumber: 'c' });
 		</script>
 	</body>
 </html>
