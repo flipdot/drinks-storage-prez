@@ -34,12 +34,11 @@ app.get("/", function(req, res) {
 
 	var stream = fs.createReadStream(opts.baseDir + '/index.html');
 	stream.on('error', function( error ) {
+		res.writeHead( 200, { 'Content-Type': 'text/html' } );
 		res.write('<style>body{font-family: sans-serif;}</style><h2>reveal.js multiplex server.</h2><a href="/token">Generate token</a>');
 		res.end();
 	});
-	stream.on('readable', function() {
-		stream.pipe(res);
-	});
+	stream.pipe(res);
 });
 
 app.get("/token", function(req,res) {
@@ -50,8 +49,7 @@ app.get("/token", function(req,res) {
 });
 
 var createHash = function(secret) {
-	var cipher = crypto.createCipher('blowfish', secret);
-	return(cipher.final('hex'));
+	return crypto.createHash('sha256').update(secret).digest('hex');
 };
 
 // Actually listen
