@@ -3,10 +3,15 @@ var express   = require('express');
 var fs        = require('fs');
 var io        = require('socket.io');
 var Mustache  = require('mustache');
+var { rateLimit } = require('express-rate-limit');
 
 var app       = express();
 var staticDir = express.static;
 var server    = http.createServer(app);
+
+// Local presentation tool, but keep the HTTP surface rate-limited.
+var limiter   = rateLimit({ windowMs: 15 * 60 * 1000, limit: 500 });
+app.use(limiter);
 
 io = io(server);
 
@@ -47,7 +52,7 @@ app.get('/', function( req, res ) {
 app.get( '/notes/:socketId', function( req, res ) {
 
 	fs.readFile( opts.baseDir + 'plugin/notes-server/notes.html', function( err, data ) {
-		res.send( Mustache.to_html( data.toString(), {
+		res.send( Mustache.render( data.toString(), {
 			socketId : req.params.socketId
 		}));
 	});
