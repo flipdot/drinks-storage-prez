@@ -8,6 +8,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # The job only reads the repository and runs the test suite.
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
