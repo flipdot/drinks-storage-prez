@@ -3,10 +3,15 @@ var express		= require('express');
 var fs			= require('fs');
 var io			= require('socket.io');
 var crypto		= require('crypto');
+var { rateLimit } = require('express-rate-limit');
 
 var app       	= express();
 var staticDir 	= express.static;
 var server    	= http.createServer(app);
+
+// Local presentation tool, but keep the HTTP surface rate-limited.
+var limiter  	= rateLimit({ windowMs: 15 * 60 * 1000, limit: 500 });
+app.use(limiter);
 
 io = io(server);
 
