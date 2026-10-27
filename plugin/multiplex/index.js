@@ -47,9 +47,9 @@ app.get("/", function(req, res) {
 });
 
 app.get("/token", function(req,res) {
-	var ts = new Date().getTime();
-	var rand = Math.floor(Math.random()*9999999);
-	var secret = ts.toString() + rand.toString();
+	// The secret authenticates multiplex presenters, so it must be
+	// unpredictable; Math.random() is not cryptographically secure.
+	var secret = crypto.randomBytes(16).toString('hex');
 	res.send({secret: secret, socketId: createHash(secret)});
 });
 

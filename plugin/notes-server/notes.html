@@ -272,6 +272,7 @@
 
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/plugin/markdown/marked.js"></script>
+		<script src="/lib/js/dompurify.min.js"></script>
 
 		<script>
 		(function() {
@@ -323,7 +324,16 @@
 			// message to be sent back
 			window.addEventListener( 'message', function( event ) {
 
-				var data = JSON.parse( event.data );
+				// Only accept messages from our own origin
+				if( event.origin !== window.location.origin ) return;
+
+				var data;
+				try {
+					data = JSON.parse( event.data );
+				}
+				catch( error ) {
+					return;
+				}
 
 				if( data && data.namespace === 'reveal' ) {
 					if( /ready/.test( data.eventName ) ) {
@@ -352,11 +362,13 @@
 				// No need for updating the notes in case of fragment changes
 				if ( data.notes ) {
 					notes.classList.remove( 'hidden' );
+					// Notes arrive via postMessage; sanitize before
+					// interpreting them as HTML.
 					if( data.markdown ) {
-						notesValue.innerHTML = marked( data.notes );
+						notesValue.innerHTML = DOMPurify.sanitize( marked( data.notes ) );
 					}
 					else {
-						notesValue.innerHTML = data.notes;
+						notesValue.innerHTML = DOMPurify.sanitize( data.notes );
 					}
 				}
 				else {

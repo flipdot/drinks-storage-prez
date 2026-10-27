@@ -233,11 +233,19 @@
 						}
 						else {
 
-							section.outerHTML = '<section data-state="alert">' +
-								'ERROR: The attempt to fetch ' + url + ' failed with HTTP status ' + xhr.status + '.' +
-								'Check your browser\'s JavaScript console for more details.' +
-								'<p>Remember that you need to serve the presentation HTML from a HTTP server.</p>' +
-								'</section>';
+							// Build the error slide in the DOM so the
+							// (untrusted) fetch URL is never reinterpreted
+							// as HTML.
+							var errorSection = document.createElement( 'section' );
+							errorSection.setAttribute( 'data-state', 'alert' );
+							errorSection.textContent = 'ERROR: The attempt to fetch ' + url + ' failed with HTTP status ' + xhr.status + '.';
+							var errorDetails = document.createElement( 'p' );
+							errorDetails.textContent = 'Check your browser\'s JavaScript console for more details.';
+							errorSection.appendChild( errorDetails );
+							var errorServer = document.createElement( 'p' );
+							errorServer.textContent = 'Remember that you need to serve the presentation HTML from a HTTP server.';
+							errorSection.appendChild( errorServer );
+							section.parentNode.replaceChild( errorSection, section );
 
 						}
 					}
